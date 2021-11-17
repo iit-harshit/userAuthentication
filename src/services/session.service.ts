@@ -24,7 +24,7 @@ export function createAccessToken({
 }) {
   const accessToken = sign(
     { ...user, session: session._id },
-    { expiresIn: config.get("accessTokenTime") }
+    { expiresIn: config.get("accessTokenTtl") }
   );
 }
 export async function reIssueAccessToken({
