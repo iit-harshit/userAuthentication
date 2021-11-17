@@ -23,13 +23,13 @@ export async function validatePassword({
     return false;
   }
 
-  const isValid = user.comparePassword(password);
-  if (!isValid) {
-    return false;
-  }
+  const isValid = await user.comparePassword(password);
+
+  if (!isValid) return false;
+
   return omit(user.toJSON(), "password");
 }
 
 export async function findUser(query: FilterQuery<UserDocument>) {
-  return await User.findOne(query).lean();
+  return User.findOne(query).lean();
 }

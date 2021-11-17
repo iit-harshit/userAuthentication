@@ -6,7 +6,10 @@ import { decode, sign } from "../utils/jwt.utils";
 import { get } from "lodash";
 import { findUser } from "./user.service";
 
-export async function createSession(userId: string, userAgent: string) {
+export async function createSession(
+  userId: UserDocument["_id"],
+  userAgent: string
+) {
   const session = await Session.create({ user: userId, userAgent });
 
   return session.toJSON();
@@ -16,12 +19,8 @@ export function createAccessToken({
   user,
   session,
 }: {
-  user:
-    | LeanDocument<Omit<UserDocument, "password">>
-    | Omit<UserDocument, "password">;
-  session:
-    | Omit<SessionDocument, "password">
-    | LeanDocument<Omit<SessionDocument, "password">>;
+  user: UserDocument;
+  session: SessionDocument;
 }) {
   const accessToken = sign(
     { ...user, session: session._id },
@@ -48,7 +47,10 @@ export async function reIssueAccessToken({
 
   if (!user) return false;
 
-  const accessToken = createAccessToken({ user, session });
+  const accessToken = sign(
+    { ...user, session: session._id },
+    { expiresIn: config.get("accessTokenTtl") }
+  );
 
   return accessToken;
 }
